@@ -15,7 +15,7 @@ import claude_reasoner
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("app")
 
-app = FastAPI(title="SkillGuard - AI Agent Skill Security Pipeline")
+app = FastAPI(title="SkillGuard - AI Agent Security Inspector")
 
 class SkillSubmissionModel(BaseModel):
     skill_name: str
@@ -35,51 +35,53 @@ DASHBOARD_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillGuard - AI Agent Skill Security Pipeline</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>SkillGuard — AI Tool Security Inspector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #03050a;
-            --bg-surface: rgba(10, 14, 26, 0.7);
-            --bg-card: rgba(18, 24, 43, 0.45);
-            --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.2);
-            --accent: #10b981;
-            --accent-glow: rgba(16, 185, 129, 0.2);
-            --danger: #f43f5e;
-            --danger-glow: rgba(244, 63, 94, 0.25);
-            --warning: #f59e0b;
-            --text-main: #f8fafc;
-            --text-muted: #64748b;
-            --border: rgba(255, 255, 255, 0.05);
-            --terminal-bg: #010204;
+            --bg-base: #fbf9f5;
+            --bg-surface: #ffffff;
+            --bg-card: #f4f0ea;
+            --text-main: #1e1e1e;
+            --text-muted: #6e6a66;
+            --border: #e6e0d8;
+            --accent-coral: #da7756;
+            --accent-coral-hover: #c86545;
+            --accent-coral-light: #fdf2ee;
+            --safe-green: #15803d;
+            --safe-bg: #f0fdf4;
+            --safe-border: #bbf7d0;
+            --warning-amber: #b45309;
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --unsafe-red: #b91c1c;
+            --unsafe-bg: #fef2f2;
+            --unsafe-border: #fecaca;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', sans-serif;
         }
-
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: var(--bg-base); }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 2px; }
 
         body {
             background-color: var(--bg-base);
             color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         header {
-            background: rgba(4, 6, 12, 0.9);
-            backdrop-filter: blur(20px);
+            background: var(--bg-base);
             border-bottom: 1px solid var(--border);
-            padding: 0.85rem 2rem;
+            padding: 1rem 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -88,24 +90,34 @@ DASHBOARD_HTML = """
         .brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.85rem;
         }
 
-        .logo-box {
+        .logo-mark {
             width: 28px;
             height: 28px;
+            background: var(--accent-coral);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
         }
 
         h1 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #a5b4fc, #fda4af);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: 'Newsreader', serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .tagline {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         main {
@@ -114,256 +126,256 @@ DASHBOARD_HTML = """
             overflow: hidden;
         }
 
-        .panel {
+        .column {
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .panel-editor {
-            flex: 1.1;
+        .col-left {
+            flex: 1.15;
             border-right: 1px solid var(--border);
+            background: var(--bg-surface);
         }
 
-        .panel-analytics {
-            flex: 0.9;
-            background-color: rgba(6, 9, 18, 0.35);
+        .col-right {
+            flex: 0.85;
+            background: var(--bg-base);
         }
 
-        .panel-header {
-            background: rgba(4, 6, 12, 0.4);
+        .section-header {
+            padding: 1rem 2rem;
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 1.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
+            background: var(--bg-base);
         }
 
-        .panel-title {
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #64748b;
-        }
-
-        .presets-row {
-            background: rgba(10, 14, 26, 0.3);
-            padding: 0.75rem 1.75rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .preset-pill {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 0.35rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .preset-pill:hover {
-            color: white;
-            border-color: rgba(99, 102, 241, 0.3);
-            background: var(--primary-glow);
-        }
-
-        .editor-container {
-            padding: 1.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .label {
-            font-size: 0.7rem;
+        .section-title {
+            font-size: 0.78rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: #64748b;
+            color: var(--text-muted);
         }
 
-        .input-text {
-            background-color: var(--terminal-bg);
+        .presets-container {
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .preset-chip {
+            background: var(--bg-surface);
             border: 1px solid var(--border);
-            border-radius: 6px;
             color: var(--text-main);
-            padding: 0.65rem 0.85rem;
-            font-size: 0.85rem;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .preset-chip:hover {
+            border-color: var(--accent-coral);
+            color: var(--accent-coral);
+            background: var(--accent-coral-light);
+        }
+
+        .form-body {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .input-box {
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
             outline: none;
-            width: 100%;
+            transition: border-color 0.15s ease;
+            font-family: inherit;
         }
 
-        .input-text:focus {
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 0 12px var(--primary-glow);
+        .input-box:focus {
+            border-color: var(--accent-coral);
+            background: var(--bg-surface);
         }
 
-        .textarea {
+        .textarea-box {
             font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
             resize: vertical;
         }
 
-        .advanced-toggle {
-            font-size: 0.72rem;
-            color: #6366f1;
-            cursor: pointer;
-            user-select: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-weight: 600;
-        }
-
-        .advanced-fields {
-            display: none;
-            gap: 0.75rem;
-            padding: 1rem;
-            background: rgba(10, 14, 26, 0.3);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-        }
-
-        .btn-inspect {
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
+        .btn-submit {
+            background: var(--accent-coral);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            border-radius: 6px;
+            padding: 0.85rem 1.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: background 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
         }
 
-        .btn-inspect:hover {
-            opacity: 0.95;
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+        .btn-submit:hover {
+            background: var(--accent-coral-hover);
         }
 
-        /* Sleek Results Panel */
-        .verdict-card {
-            padding: 2rem 1.75rem;
+        /* Results View */
+        .verdict-hero {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-surface);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border);
-            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.04) 0%, transparent 80%);
-            transition: all 0.3s;
         }
 
-        .verdict-card.malicious {
-            background: radial-gradient(circle at center, rgba(244, 63, 94, 0.06) 0%, transparent 80%);
-        }
-
-        .verdict-tag {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            padding: 0.35rem 1rem;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-
-        .verdict-tag.benign { color: var(--accent); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); }
-        .verdict-tag.suspicious { color: var(--warning); background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); }
-        .verdict-tag.malicious { color: var(--danger); background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); }
-
-        .threat-val {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 1;
-        }
-
-        /* Minimalist Layer Status Bar */
-        .layer-capsules-bar {
-            display: flex;
+        .status-badge {
+            font-family: 'Newsreader', serif;
+            font-size: 1.8rem;
+            font-weight: 500;
+            padding: 0.4rem 1.25rem;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
             gap: 0.5rem;
-            padding: 1rem 1.75rem;
+        }
+
+        .status-badge.safe { background: var(--safe-bg); color: var(--safe-green); border: 1px solid var(--safe-border); }
+        .status-badge.review { background: var(--warning-bg); color: var(--warning-amber); border: 1px solid var(--warning-border); }
+        .status-badge.unsafe { background: var(--unsafe-bg); color: var(--unsafe-red); border: 1px solid var(--unsafe-border); }
+
+        .risk-score-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .risk-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text-main);
+        }
+
+        /* Checks Summary */
+        .checks-grid {
+            padding: 1.25rem 2rem;
             border-bottom: 1px solid var(--border);
-            overflow-x: auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.6rem;
+            background: var(--bg-surface);
         }
 
-        .layer-capsule {
-            flex: 1;
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid var(--border);
+        .check-card {
+            background: var(--bg-card);
             border-radius: 6px;
-            padding: 0.5rem 0.65rem;
+            padding: 0.6rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.15rem;
-            min-width: 70px;
+            gap: 0.2rem;
+            text-align: center;
         }
 
-        .layer-capsule-title { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
-        .layer-capsule-score { font-size: 0.95rem; font-weight: 700; }
+        .check-name { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); }
+        .check-val { font-size: 0.95rem; font-weight: 700; }
 
-        /* Timeline & Reasoning */
-        .analytics-content {
-            flex: 1;
+        /* Report Body */
+        .report-body {
+            padding: 2rem;
             overflow-y: auto;
-            padding: 1.75rem;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 1.5rem;
         }
 
-        .graph-nodes-line {
+        .report-block {
             display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            overflow-x: auto;
-            padding: 0.4rem 0;
+            flex-direction: column;
+            gap: 0.6rem;
         }
 
-        .graph-pill {
-            background: var(--terminal-bg);
+        .block-heading {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .reason-card {
+            background: var(--bg-surface);
             border: 1px solid var(--border);
-            color: #818cf8;
-            padding: 0.35rem 0.75rem;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            font-family: monospace;
-        }
-
-        .trace-card {
-            background: rgba(15, 23, 42, 0.3);
-            border-left: 3px solid var(--primary);
-            border-radius: 5px;
-            padding: 0.75rem 1rem;
-            font-size: 0.8rem;
-            font-family: 'Courier New', Courier, monospace;
-            line-height: 1.5;
-            color: #cbd5e1;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: var(--text-main);
         }
 
         .remediation-card {
-            background: rgba(16, 185, 129, 0.03);
-            border-left: 3px solid var(--accent);
-            border-radius: 5px;
-            padding: 0.75rem 1rem;
+            background: var(--safe-bg);
+            border: 1px solid var(--safe-border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-size: 0.88rem;
+            color: var(--safe-green);
+            line-height: 1.5;
+        }
+
+        .sequence-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .sequence-chip {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.85rem;
+            border-radius: 6px;
             font-size: 0.8rem;
-            color: #a7f3d0;
+            font-family: monospace;
+            color: var(--text-main);
         }
     </style>
 </head>
@@ -371,55 +383,44 @@ DASHBOARD_HTML = """
 
     <header>
         <div class="brand">
-            <div class="logo-box">
-                <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="logo-shield" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#818cf8" />
-                            <stop offset="100%" stop-color="#f43f5e" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M50 12 L82 24 C82 52, 72 70, 50 85 C28 70, 18 52, 18 24 Z" stroke="url(#logo-shield)" stroke-width="6" fill="transparent" />
-                    <path d="M35 50 L45 60 L65 40" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </div>
+            <div class="logo-mark">S</div>
             <h1>SkillGuard</h1>
         </div>
-        <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">
-            AI Skill Security Inspection Pipeline
+        <div class="tagline">
+            Simple, Powerful AI Tool Security Inspection
         </div>
     </header>
 
     <main>
-        <!-- Left Panel: Skill Submission & Code Editor -->
-        <div class="panel panel-editor">
-            <div class="panel-header">
-                <span class="panel-title">Skill Inspector</span>
+        <!-- Left Panel: Tool Inspector Form -->
+        <div class="column col-left">
+            <div class="section-header">
+                <span class="section-title">Inspect an AI Tool / Skill</span>
             </div>
 
-            <!-- Presets Row -->
-            <div class="presets-row">
-                <span style="font-size:0.7rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Test Presets:</span>
-                <button class="preset-pill" onclick="loadPreset('clean')">Clean Math</button>
-                <button class="preset-pill" onclick="loadPreset('prompt_injection')">Prompt Injection</button>
-                <button class="preset-pill" onclick="loadPreset('steg_dropper')">Steganography Dropper</button>
-                <button class="preset-pill" onclick="loadPreset('chain_attack')">Multi-Step Attack</button>
+            <!-- Example Presets -->
+            <div class="presets-container">
+                <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Try Examples:</span>
+                <button class="preset-chip" onclick="loadSample('clean')">Safe Calculator</button>
+                <button class="preset-chip" onclick="loadSample('prompt_injection')">Instruction Hijack</button>
+                <button class="preset-chip" onclick="loadSample('steg_dropper')">Hidden Virus Dropper</button>
+                <button class="preset-chip" onclick="loadSample('chain_attack')">Data Leak Sequence</button>
             </div>
 
-            <form class="editor-container" onsubmit="submitSkill(event)">
-                <div class="input-group">
-                    <label class="label">Skill Name</label>
-                    <input type="text" id="skill-name" class="input-text" required value="calculator_skill">
+            <form class="form-body" onsubmit="inspectSkill(event)">
+                <div class="field-group">
+                    <label>Tool Name</label>
+                    <input type="text" id="skill-name" class="input-box" required value="calculator_skill" placeholder="e.g. calculator_skill">
                 </div>
 
-                <div class="input-group">
-                    <label class="label">Description / Instructions</label>
-                    <textarea id="description" class="input-text textarea" style="height:65px;" placeholder="What does this skill do?">Evaluates basic arithmetic calculations and safe math functions.</textarea>
+                <div class="field-group">
+                    <label>Tool Instructions & Purpose</label>
+                    <textarea id="description" class="input-box textarea-box" style="height:70px;" placeholder="What is this tool supposed to do?">Evaluates basic arithmetic calculations and safe math functions.</textarea>
                 </div>
 
-                <div class="input-group" style="flex:1;">
-                    <label class="label">Python Code Implementation</label>
-                    <textarea id="code-body" class="input-text textarea" style="flex:1; min-height:150px;" placeholder="def run_skill(): ...">def run_skill(expr):
+                <div class="field-group" style="flex:1;">
+                    <label>Python Code Implementation</label>
+                    <textarea id="code-body" class="input-box textarea-box" style="flex:1; min-height:160px;" placeholder="Paste Python code here...">def run_skill(expr):
     # Safe evaluation of math expressions
     allowed = "0123456789+-*/. "
     if all(c in allowed for c in expr):
@@ -428,98 +429,85 @@ DASHBOARD_HTML = """
 </textarea>
                 </div>
 
-                <!-- Collapsible Advanced Config -->
-                <div>
-                    <span class="advanced-toggle" onclick="toggleAdvanced()">
-                        <span id="adv-arrow">▸</span> Advanced Session Metadata
-                    </span>
-                    <div class="advanced-fields" id="adv-fields" style="margin-top:0.5rem;">
-                        <div class="input-group" style="flex:1;">
-                            <label class="label">Skill Category/Type</label>
-                            <input type="text" id="skill-type" class="input-text" value="utility">
-                        </div>
-                        <div class="input-group" style="flex:1;">
-                            <label class="label">Author Registry ID</label>
-                            <input type="text" id="author-id" class="input-text" value="official-agent-registry">
-                        </div>
-                        <div class="input-group" style="flex:1;">
-                            <label class="label">Session ID</label>
-                            <input type="text" id="session-id" class="input-text" value="session-alpha">
-                        </div>
-                    </div>
-                </div>
+                <input type="hidden" id="skill-type" value="utility">
+                <input type="hidden" id="author-id" value="official-agent-registry">
+                <input type="hidden" id="session-id" value="session-alpha">
 
-                <button type="submit" class="btn-inspect">
-                    Inspect Skill
+                <button type="submit" class="btn-submit">
+                    Run Security Inspection
                 </button>
             </form>
         </div>
 
-        <!-- Right Panel: Threat Analytics & Graph Visualizer -->
-        <div class="panel panel-analytics">
-            <div class="panel-header">
-                <span class="panel-title">Inspection Results</span>
+        <!-- Right Panel: Inspection Report -->
+        <div class="column col-right">
+            <div class="section-header">
+                <span class="section-title">Security Inspection Report</span>
             </div>
 
-            <!-- Verdict Card -->
-            <div class="verdict-card" id="verdict-card">
-                <div>
-                    <div class="verdict-tag benign" id="verdict-tag">BENIGN</div>
+            <!-- Verdict Hero Banner -->
+            <div class="verdict-hero">
+                <div class="status-badge safe" id="status-badge">
+                    <span>✓</span> <span id="status-text">SAFE TO USE</span>
                 </div>
-                <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                    <span class="threat-val" id="threat-val" style="color:var(--accent);">0.0%</span>
-                    <span style="font-size:0.65rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Overall Threat</span>
-                </div>
-            </div>
-
-            <!-- Layer Capsules Bar -->
-            <div class="layer-capsules-bar">
-                <div class="layer-capsule">
-                    <span class="layer-capsule-title">L1: AST</span>
-                    <span class="layer-capsule-score" id="l1-score">0%</span>
-                </div>
-                <div class="layer-capsule">
-                    <span class="layer-capsule-title">L2: ML</span>
-                    <span class="layer-capsule-score" id="l2-score">0%</span>
-                </div>
-                <div class="layer-capsule">
-                    <span class="layer-capsule-title">L3: Provenance</span>
-                    <span class="layer-capsule-score" id="l3-score">0%</span>
-                </div>
-                <div class="layer-capsule">
-                    <span class="layer-capsule-title">L4: Sequence</span>
-                    <span class="layer-capsule-score" id="l4-score">0%</span>
-                </div>
-                <div class="layer-capsule">
-                    <span class="layer-capsule-title">T3: Claude</span>
-                    <span class="layer-capsule-score" id="l5-score">0%</span>
+                <div class="risk-score-badge">
+                    <span class="risk-number" id="risk-number" style="color:var(--safe-green);">0%</span>
+                    <span style="font-size:0.68rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Overall Threat Risk</span>
                 </div>
             </div>
 
-            <!-- Analytics Content -->
-            <div class="analytics-content">
-                <div>
-                    <span class="panel-title" style="font-size:0.65rem; margin-bottom:0.4rem; display:block;">Session Skill Chain</span>
-                    <div class="graph-nodes-line" id="graph-nodes-container">
-                        <span class="graph-pill">calculator_skill</span>
+            <!-- 5 Plain English Checks -->
+            <div class="checks-grid">
+                <div class="check-card">
+                    <span class="check-name">Code Safety</span>
+                    <span class="check-val" id="c1-val">Passed</span>
+                </div>
+                <div class="check-card">
+                    <span class="check-name">Instructions</span>
+                    <span class="check-val" id="c2-val">Passed</span>
+                </div>
+                <div class="check-card">
+                    <span class="check-name">Publisher</span>
+                    <span class="check-val" id="c3-val">Passed</span>
+                </div>
+                <div class="check-card">
+                    <span class="check-name">Chain Risk</span>
+                    <span class="check-val" id="c4-val">Passed</span>
+                </div>
+                <div class="check-card">
+                    <span class="check-name">AI Review</span>
+                    <span class="check-val" id="c5-val">Passed</span>
+                </div>
+            </div>
+
+            <!-- Report Details Body -->
+            <div class="report-body">
+                <div class="report-block">
+                    <span class="block-heading">Active Tool Execution Sequence</span>
+                    <div class="sequence-row" id="sequence-container">
+                        <span class="sequence-chip">calculator_skill</span>
                     </div>
                 </div>
 
-                <div id="traces-container" style="display:flex; flex-direction:column; gap:0.6rem;">
-                    <span class="panel-title" style="font-size:0.65rem;">Reasoning Signals</span>
-                    <div class="trace-card">All security defense layers passed without triggering alerts.</div>
+                <div class="report-block">
+                    <span class="block-heading">Security Findings</span>
+                    <div id="findings-container" style="display:flex; flex-direction:column; gap:0.6rem;">
+                        <div class="reason-card">All 5 security checks passed cleanly. No malicious code or hidden prompts detected.</div>
+                    </div>
                 </div>
 
-                <div id="remediation-container" style="display:flex; flex-direction:column; gap:0.6rem;">
-                    <span class="panel-title" style="font-size:0.65rem;">Actionable Remediation</span>
-                    <div class="remediation-card">No remediation required. Skill complies with security policies.</div>
+                <div class="report-block">
+                    <span class="block-heading">Recommended Action</span>
+                    <div id="action-container">
+                        <div class="remediation-card">✓ Approved. This tool is safe for your AI agent to execute.</div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        const PRESETS = {
+        const SAMPLES = {
             clean: {
                 skill_name: "calculator_skill",
                 skill_type: "utility",
@@ -555,13 +543,13 @@ os.system(decoded)`
             }
         };
 
-        function loadPreset(key) {
+        function loadSample(key) {
             if (key === 'chain_attack') {
-                runCompositionAttackSimulation();
+                runChainSimulation();
                 return;
             }
 
-            const data = PRESETS[key];
+            const data = SAMPLES[key];
             document.getElementById('skill-name').value = data.skill_name;
             document.getElementById('skill-type').value = data.skill_type;
             document.getElementById('author-id').value = data.author_id;
@@ -569,19 +557,7 @@ os.system(decoded)`
             document.getElementById('code-body').value = data.code_body;
         }
 
-        function toggleAdvanced() {
-            const fields = document.getElementById('adv-fields');
-            const arrow = document.getElementById('adv-arrow');
-            if (fields.style.display === 'flex') {
-                fields.style.display = 'none';
-                arrow.innerText = '▸';
-            } else {
-                fields.style.display = 'flex';
-                arrow.innerText = '▾';
-            }
-        }
-
-        async function submitSkill(e) {
+        async function inspectSkill(e) {
             if (e) e.preventDefault();
 
             const payload = {
@@ -600,79 +576,79 @@ os.system(decoded)`
             });
 
             const resData = await resp.json();
-            renderAnalysis(resData);
+            renderReport(resData);
         }
 
-        function renderAnalysis(data) {
+        function renderReport(data) {
             const verdict = data.verdict;
-            const tag = document.getElementById('verdict-tag');
-            const val = document.getElementById('threat-val');
-            const card = document.getElementById('verdict-card');
+            const badge = document.getElementById('status-badge');
+            const badgeText = document.getElementById('status-text');
+            const riskNum = document.getElementById('risk-number');
 
-            tag.innerText = verdict;
-            tag.className = `verdict-tag ${verdict.toLowerCase()}`;
-            val.innerText = `${data.overall_threat_score}%`;
+            riskNum.innerText = `${data.overall_threat_score}%`;
 
             if (verdict === 'MALICIOUS') {
-                val.style.color = 'var(--danger)';
-                card.className = 'verdict-card malicious';
+                badge.className = 'status-badge unsafe';
+                badgeText.innerText = 'DANGEROUS / BLOCKED';
+                riskNum.style.color = 'var(--unsafe-red)';
             } else if (verdict === 'SUSPICIOUS') {
-                val.style.color = 'var(--warning)';
-                card.className = 'verdict-card';
+                badge.className = 'status-badge review';
+                badgeText.innerText = 'NEEDS REVIEW';
+                riskNum.style.color = 'var(--warning-amber)';
             } else {
-                val.style.color = 'var(--accent)';
-                card.className = 'verdict-card';
+                badge.className = 'status-badge safe';
+                badgeText.innerText = 'SAFE TO USE';
+                riskNum.style.color = 'var(--safe-green)';
             }
 
+            // Checks Status Summary
             const bd = data.layer_breakdown;
-            document.getElementById('l1-score').innerText = `${bd.layer1_rules_ast}%`;
-            document.getElementById('l2-score').innerText = `${bd.layer2_prompt_injection}%`;
-            document.getElementById('l3-score').innerText = `${bd.layer3_provenance}%`;
-            document.getElementById('l4-score').innerText = `${bd.layer4_graph_composition}%`;
-            document.getElementById('l5-score').innerText = `${bd.tier3_claude_reasoning}%`;
+            document.getElementById('c1-val').innerText = bd.layer1_rules_ast > 0 ? `${bd.layer1_rules_ast}%` : 'Passed';
+            document.getElementById('c2-val').innerText = bd.layer2_prompt_injection > 0 ? `${bd.layer2_prompt_injection}%` : 'Passed';
+            document.getElementById('c3-val').innerText = bd.layer3_provenance > 0 ? `${bd.layer3_provenance}%` : 'Passed';
+            document.getElementById('c4-val').innerText = bd.layer4_graph_composition > 0 ? `${bd.layer4_graph_composition}%` : 'Passed';
+            document.getElementById('c5-val').innerText = bd.tier3_claude_reasoning > 0 ? `${bd.tier3_claude_reasoning}%` : 'Passed';
 
-            // Session skill chain line
-            const graphContainer = document.getElementById('graph-nodes-container');
-            graphContainer.innerHTML = '';
-            
+            // Execution sequence
+            const seqContainer = document.getElementById('sequence-container');
+            seqContainer.innerHTML = '';
             const nodes = data.graph_details ? data.graph_details.nodes : [data.skill_name];
             nodes.forEach((n, idx) => {
-                const pill = document.createElement('span');
-                pill.className = 'graph-pill';
-                pill.innerText = n;
-                graphContainer.appendChild(pill);
+                const chip = document.createElement('span');
+                chip.className = 'sequence-chip';
+                chip.innerText = n;
+                seqContainer.appendChild(chip);
 
                 if (idx < nodes.length - 1) {
-                    const arr = document.createElement('span');
-                    arr.style.color = 'var(--text-muted)';
-                    arr.style.fontSize = '0.75rem';
-                    arr.innerText = '➔';
-                    graphContainer.appendChild(arr);
+                    const arrow = document.createElement('span');
+                    arrow.style.color = 'var(--text-muted)';
+                    arrow.innerText = '➔';
+                    seqContainer.appendChild(arrow);
                 }
             });
 
-            // Reasoning traces
-            const traceContainer = document.getElementById('traces-container');
-            traceContainer.innerHTML = `<span class="panel-title" style="font-size:0.65rem;">Reasoning Signals</span>`;
-
+            // Findings
+            const findContainer = document.getElementById('findings-container');
+            findContainer.innerHTML = '';
             data.reasoning_trace.forEach(tr => {
                 const item = document.createElement('div');
-                item.className = 'trace-card';
+                item.className = 'reason-card';
                 item.innerText = tr;
-                traceContainer.appendChild(item);
+                findContainer.appendChild(item);
             });
 
-            const remContainer = document.getElementById('remediation-container');
-            remContainer.innerHTML = `<span class="panel-title" style="font-size:0.65rem;">Actionable Remediation</span>`;
+            // Action
+            const actionContainer = document.getElementById('action-container');
+            actionContainer.innerHTML = '';
             data.remediation_steps.forEach(rem => {
                 const item = document.createElement('div');
                 item.className = 'remediation-card';
                 item.innerText = rem;
-                remContainer.appendChild(item);
+                actionContainer.appendChild(item);
             });
         }
 
-        async function runCompositionAttackSimulation() {
+        async function runChainSimulation() {
             const chainSession = "session-attack-" + Math.random().toString(36).substr(2, 6);
             document.getElementById('session-id').value = chainSession;
 
@@ -680,7 +656,7 @@ os.system(decoded)`
             document.getElementById('skill-type').value = "file_read";
             document.getElementById('description').value = "Reads local environment configurations.";
             document.getElementById('code-body').value = "def read_db():\n    with open('config.json') as f:\n        return f.read()";
-            await submitSkill();
+            await inspectSkill();
 
             await new Promise(r => setTimeout(r, 600));
 
@@ -688,7 +664,7 @@ os.system(decoded)`
             document.getElementById('skill-type').value = "compress";
             document.getElementById('description').value = "Compresses output files into zip archive.";
             document.getElementById('code-body').value = "import zipfile\ndef zip_files():\n    pass";
-            await submitSkill();
+            await inspectSkill();
 
             await new Promise(r => setTimeout(r, 600));
 
@@ -696,7 +672,7 @@ os.system(decoded)`
             document.getElementById('skill-type').value = "http_post";
             document.getElementById('description').value = "Sends data to external endpoint.";
             document.getElementById('code-body').value = "import urllib.request\ndef send_data(data):\n    pass";
-            await submitSkill();
+            await inspectSkill();
         }
     </script>
 </body>
