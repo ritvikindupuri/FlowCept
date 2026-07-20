@@ -40,7 +40,7 @@ DASHBOARD_HTML = """
     <style>
         :root {
             --bg-base: #03050a;
-            --bg-surface: rgba(10, 14, 26, 0.8);
+            --bg-surface: rgba(10, 14, 26, 0.7);
             --bg-card: rgba(18, 24, 43, 0.45);
             --primary: #6366f1;
             --primary-glow: rgba(99, 102, 241, 0.2);
@@ -62,9 +62,9 @@ DASHBOARD_HTML = """
             font-family: 'Outfit', sans-serif;
         }
 
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: var(--bg-base); }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 2px; }
 
         body {
             background-color: var(--bg-base);
@@ -92,16 +92,17 @@ DASHBOARD_HTML = """
         }
 
         .logo-box {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         h1 {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
             background: linear-gradient(135deg, #a5b4fc, #fda4af);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -132,7 +133,7 @@ DASHBOARD_HTML = """
         .panel-header {
             background: rgba(4, 6, 12, 0.4);
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -140,45 +141,45 @@ DASHBOARD_HTML = """
         }
 
         .panel-title {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: #64748b;
         }
 
-        .benchmarks-bar {
-            background: rgba(10, 14, 26, 0.4);
-            padding: 0.6rem 1.5rem;
+        .presets-row {
+            background: rgba(10, 14, 26, 0.3);
+            padding: 0.75rem 1.75rem;
             border-bottom: 1px solid var(--border);
             display: flex;
             gap: 0.5rem;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
-        .benchmark-btn {
+        .preset-pill {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
             color: var(--text-muted);
-            padding: 0.3rem 0.6rem;
-            font-size: 0.72rem;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .benchmark-btn:hover {
+        .preset-pill:hover {
             color: white;
-            border-color: var(--primary);
+            border-color: rgba(99, 102, 241, 0.3);
             background: var(--primary-glow);
         }
 
-        .editor-form {
-            padding: 1.5rem;
+        .editor-container {
+            padding: 1.75rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
             overflow-y: auto;
             flex: 1;
         }
@@ -186,14 +187,14 @@ DASHBOARD_HTML = """
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: 0.4rem;
         }
 
         .label {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: #64748b;
         }
 
@@ -202,170 +203,166 @@ DASHBOARD_HTML = """
             border: 1px solid var(--border);
             border-radius: 6px;
             color: var(--text-main);
-            padding: 0.55rem 0.85rem;
+            padding: 0.65rem 0.85rem;
             font-size: 0.85rem;
             outline: none;
             width: 100%;
         }
 
         .input-text:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 12px var(--primary-glow);
         }
 
         .textarea {
             font-family: 'Courier New', Courier, monospace;
             resize: vertical;
-            min-height: 110px;
         }
 
-        .btn {
-            background-color: var(--primary);
+        .advanced-toggle {
+            font-size: 0.72rem;
+            color: #6366f1;
+            cursor: pointer;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 600;
+        }
+
+        .advanced-fields {
+            display: none;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: rgba(10, 14, 26, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .btn-inspect {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
             color: white;
             border: none;
-            padding: 0.6rem 1.25rem;
+            padding: 0.75rem 1.5rem;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.03em;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn:hover {
-            background-color: #4338ca;
             box-shadow: 0 4px 15px var(--primary-glow);
         }
 
-        /* Analytics View */
-        .verdict-banner {
-            padding: 1.75rem;
+        .btn-inspect:hover {
+            opacity: 0.95;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Sleek Results Panel */
+        .verdict-card {
+            padding: 2rem 1.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
-            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.03) 0%, transparent 80%);
+            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.04) 0%, transparent 80%);
+            transition: all 0.3s;
         }
 
-        .verdict-banner.malicious {
-            background: radial-gradient(circle at center, rgba(244, 63, 94, 0.05) 0%, transparent 80%);
+        .verdict-card.malicious {
+            background: radial-gradient(circle at center, rgba(244, 63, 94, 0.06) 0%, transparent 80%);
         }
 
-        .verdict-badge {
-            font-size: 1.5rem;
+        .verdict-tag {
+            font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: 0.05em;
-            padding: 0.4rem 1.25rem;
+            padding: 0.35rem 1rem;
             border-radius: 6px;
             text-transform: uppercase;
         }
 
-        .verdict-badge.benign { background-color: rgba(16, 185, 129, 0.1); color: var(--accent); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .verdict-badge.suspicious { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .verdict-badge.malicious { background-color: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); animation: flash-red 2s infinite; }
+        .verdict-tag.benign { color: var(--accent); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); }
+        .verdict-tag.suspicious { color: var(--warning); background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); }
+        .verdict-tag.malicious { color: var(--danger); background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); }
 
-        @keyframes flash-red {
-            0% { border-color: rgba(244, 63, 94, 0.3); }
-            50% { border-color: rgba(244, 63, 94, 0.8); }
-            100% { border-color: rgba(244, 63, 94, 0.3); }
-        }
-
-        .score-box {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .score-val {
-            font-size: 2.25rem;
+        .threat-val {
+            font-size: 2.5rem;
             font-weight: 700;
+            letter-spacing: -0.03em;
             line-height: 1;
         }
 
-        /* Layer Breakdown Grid */
-        .layer-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
+        /* Minimalist Layer Status Bar */
+        .layer-capsules-bar {
+            display: flex;
             gap: 0.5rem;
-            padding: 1.25rem 1.5rem;
+            padding: 1rem 1.75rem;
             border-bottom: 1px solid var(--border);
+            overflow-x: auto;
         }
 
-        .layer-card {
+        .layer-capsule {
+            flex: 1;
             background: rgba(15, 23, 42, 0.4);
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 0.65rem 0.5rem;
+            padding: 0.5rem 0.65rem;
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .layer-name { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
-        .layer-score { font-size: 1.05rem; font-weight: 700; }
-
-        /* Graph Visualizer */
-        .graph-container {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .graph-nodes-row {
-            display: flex;
             align-items: center;
-            gap: 0.5rem;
-            overflow-x: auto;
-            padding: 0.5rem 0;
+            gap: 0.15rem;
+            min-width: 70px;
         }
 
-        .graph-node {
-            background-color: var(--terminal-bg);
-            border: 1px solid var(--primary);
-            color: #818cf8;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-family: monospace;
-            white-space: nowrap;
-        }
+        .layer-capsule-title { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .layer-capsule-score { font-size: 0.95rem; font-weight: 700; }
 
-        .graph-arrow {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        /* Reasoning Traces */
-        .trace-section {
+        /* Timeline & Reasoning */
+        .analytics-content {
             flex: 1;
             overflow-y: auto;
-            padding: 1.5rem;
+            padding: 1.75rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
-        .trace-item {
-            background: rgba(15, 23, 42, 0.35);
+        .graph-nodes-line {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            overflow-x: auto;
+            padding: 0.4rem 0;
+        }
+
+        .graph-pill {
+            background: var(--terminal-bg);
+            border: 1px solid var(--border);
+            color: #818cf8;
+            padding: 0.35rem 0.75rem;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+
+        .trace-card {
+            background: rgba(15, 23, 42, 0.3);
             border-left: 3px solid var(--primary);
-            border-radius: 4px;
+            border-radius: 5px;
             padding: 0.75rem 1rem;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-family: 'Courier New', Courier, monospace;
-            line-height: 1.45;
+            line-height: 1.5;
+            color: #cbd5e1;
         }
 
-        .remediation-item {
-            background: rgba(16, 185, 129, 0.05);
+        .remediation-card {
+            background: rgba(16, 185, 129, 0.03);
             border-left: 3px solid var(--accent);
-            border-radius: 4px;
+            border-radius: 5px;
             padding: 0.75rem 1rem;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: #a7f3d0;
         }
     </style>
@@ -375,21 +372,21 @@ DASHBOARD_HTML = """
     <header>
         <div class="brand">
             <div class="logo-box">
-                <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <linearGradient id="logo-shield" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#818cf8" />
                             <stop offset="100%" stop-color="#f43f5e" />
                         </linearGradient>
                     </defs>
-                    <path d="M50 10 L85 22 C85 55, 75 75, 50 90 C25 75, 15 55, 15 22 Z" stroke="url(#logo-shield)" stroke-width="6" fill="transparent" />
+                    <path d="M50 12 L82 24 C82 52, 72 70, 50 85 C28 70, 18 52, 18 24 Z" stroke="url(#logo-shield)" stroke-width="6" fill="transparent" />
                     <path d="M35 50 L45 60 L65 40" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </div>
             <h1>SkillGuard</h1>
         </div>
-        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">
-            AI Agent Skill Security & Composition Engine
+        <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">
+            AI Skill Security Inspection Pipeline
         </div>
     </header>
 
@@ -397,47 +394,32 @@ DASHBOARD_HTML = """
         <!-- Left Panel: Skill Submission & Code Editor -->
         <div class="panel panel-editor">
             <div class="panel-header">
-                <span class="panel-title">Skill Submission & Code Editor</span>
+                <span class="panel-title">Skill Inspector</span>
             </div>
 
-            <div class="benchmarks-bar">
-                <button class="benchmark-btn" onclick="loadBenchmark('clean')">Clean Utility Skill</button>
-                <button class="benchmark-btn" onclick="loadBenchmark('prompt_injection')">Prompt Injection Skill</button>
-                <button class="benchmark-btn" onclick="loadBenchmark('steg_dropper')">Steganography Dropper</button>
-                <button class="benchmark-btn" onclick="loadBenchmark('chain_attack')">Simulate 3-Step Composition Attack</button>
+            <!-- Presets Row -->
+            <div class="presets-row">
+                <span style="font-size:0.7rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Test Presets:</span>
+                <button class="preset-pill" onclick="loadPreset('clean')">Clean Math</button>
+                <button class="preset-pill" onclick="loadPreset('prompt_injection')">Prompt Injection</button>
+                <button class="preset-pill" onclick="loadPreset('steg_dropper')">Steganography Dropper</button>
+                <button class="preset-pill" onclick="loadPreset('chain_attack')">Multi-Step Attack</button>
             </div>
 
-            <form class="editor-form" onsubmit="submitSkill(event)">
-                <div style="display:flex; gap:0.75rem;">
-                    <div class="input-group" style="flex:2;">
-                        <label class="label">Skill Identifier</label>
-                        <input type="text" id="skill-name" class="input-text" required value="calculator_skill">
-                    </div>
-                    <div class="input-group" style="flex:1;">
-                        <label class="label">Skill Category/Type</label>
-                        <input type="text" id="skill-type" class="input-text" required value="utility">
-                    </div>
-                </div>
-
-                <div style="display:flex; gap:0.75rem;">
-                    <div class="input-group" style="flex:1;">
-                        <label class="label">Author Registry ID</label>
-                        <input type="text" id="author-id" class="input-text" value="official-agent-registry">
-                    </div>
-                    <div class="input-group" style="flex:1;">
-                        <label class="label">Session ID (Composition Graph)</label>
-                        <input type="text" id="session-id" class="input-text" value="session-alpha">
-                    </div>
+            <form class="editor-container" onsubmit="submitSkill(event)">
+                <div class="input-group">
+                    <label class="label">Skill Name</label>
+                    <input type="text" id="skill-name" class="input-text" required value="calculator_skill">
                 </div>
 
                 <div class="input-group">
-                    <label class="label">Skill Description & Tool Instruction Spec</label>
-                    <textarea id="description" class="input-text textarea" style="height:70px;" placeholder="Describe what the skill does...">Evaluates basic arithmetic calculations and safe math functions.</textarea>
+                    <label class="label">Description / Instructions</label>
+                    <textarea id="description" class="input-text textarea" style="height:65px;" placeholder="What does this skill do?">Evaluates basic arithmetic calculations and safe math functions.</textarea>
                 </div>
 
                 <div class="input-group" style="flex:1;">
-                    <label class="label">Python Code Implementation Body</label>
-                    <textarea id="code-body" class="input-text textarea" style="flex:1; min-height:160px;" placeholder="def run_skill(): ...">def run_skill(expr):
+                    <label class="label">Python Code Implementation</label>
+                    <textarea id="code-body" class="input-text textarea" style="flex:1; min-height:150px;" placeholder="def run_skill(): ...">def run_skill(expr):
     # Safe evaluation of math expressions
     allowed = "0123456789+-*/. "
     if all(c in allowed for c in expr):
@@ -446,8 +428,29 @@ DASHBOARD_HTML = """
 </textarea>
                 </div>
 
-                <button type="submit" class="btn">
-                    Run 5-Layer Security Inspection
+                <!-- Collapsible Advanced Config -->
+                <div>
+                    <span class="advanced-toggle" onclick="toggleAdvanced()">
+                        <span id="adv-arrow">▸</span> Advanced Session Metadata
+                    </span>
+                    <div class="advanced-fields" id="adv-fields" style="margin-top:0.5rem;">
+                        <div class="input-group" style="flex:1;">
+                            <label class="label">Skill Category/Type</label>
+                            <input type="text" id="skill-type" class="input-text" value="utility">
+                        </div>
+                        <div class="input-group" style="flex:1;">
+                            <label class="label">Author Registry ID</label>
+                            <input type="text" id="author-id" class="input-text" value="official-agent-registry">
+                        </div>
+                        <div class="input-group" style="flex:1;">
+                            <label class="label">Session ID</label>
+                            <input type="text" id="session-id" class="input-text" value="session-alpha">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-inspect">
+                    Inspect Skill
                 </button>
             </form>
         </div>
@@ -455,65 +458,68 @@ DASHBOARD_HTML = """
         <!-- Right Panel: Threat Analytics & Graph Visualizer -->
         <div class="panel panel-analytics">
             <div class="panel-header">
-                <span class="panel-title">Inspection Verdict & Threat Metrics</span>
+                <span class="panel-title">Inspection Results</span>
             </div>
 
-            <!-- Banner -->
-            <div class="verdict-banner" id="verdict-banner">
+            <!-- Verdict Card -->
+            <div class="verdict-card" id="verdict-card">
                 <div>
-                    <div class="verdict-badge benign" id="verdict-badge">BENIGN</div>
+                    <div class="verdict-tag benign" id="verdict-tag">BENIGN</div>
                 </div>
-                <div class="score-box">
-                    <span class="score-val" id="threat-score" style="color:var(--accent);">0.0%</span>
-                    <span style="font-size:0.68rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Overall Threat Score</span>
-                </div>
-            </div>
-
-            <!-- Layer breakdown grid -->
-            <div class="layer-grid">
-                <div class="layer-card">
-                    <span class="layer-name">L1: AST/Rules</span>
-                    <span class="layer-score" id="l1-score">0%</span>
-                </div>
-                <div class="layer-card">
-                    <span class="layer-name">L2: ML/Inject</span>
-                    <span class="layer-score" id="l2-score">0%</span>
-                </div>
-                <div class="layer-card">
-                    <span class="layer-name">L3: Provenance</span>
-                    <span class="layer-score" id="l3-score">0%</span>
-                </div>
-                <div class="layer-card">
-                    <span class="layer-name">L4: Composition</span>
-                    <span class="layer-score" id="l4-score">0%</span>
-                </div>
-                <div class="layer-card">
-                    <span class="layer-name">T3: Claude</span>
-                    <span class="layer-score" id="l5-score">0%</span>
+                <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                    <span class="threat-val" id="threat-val" style="color:var(--accent);">0.0%</span>
+                    <span style="font-size:0.65rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Overall Threat</span>
                 </div>
             </div>
 
-            <!-- Graph Composition Visualizer -->
-            <div class="graph-container">
-                <span class="panel-title" style="font-size:0.65rem;">Layer 4: Agent Skill Execution Composition Graph</span>
-                <div class="graph-nodes-row" id="graph-nodes-container">
-                    <span class="graph-node">calculator_skill</span>
+            <!-- Layer Capsules Bar -->
+            <div class="layer-capsules-bar">
+                <div class="layer-capsule">
+                    <span class="layer-capsule-title">L1: AST</span>
+                    <span class="layer-capsule-score" id="l1-score">0%</span>
+                </div>
+                <div class="layer-capsule">
+                    <span class="layer-capsule-title">L2: ML</span>
+                    <span class="layer-capsule-score" id="l2-score">0%</span>
+                </div>
+                <div class="layer-capsule">
+                    <span class="layer-capsule-title">L3: Provenance</span>
+                    <span class="layer-capsule-score" id="l3-score">0%</span>
+                </div>
+                <div class="layer-capsule">
+                    <span class="layer-capsule-title">L4: Sequence</span>
+                    <span class="layer-capsule-score" id="l4-score">0%</span>
+                </div>
+                <div class="layer-capsule">
+                    <span class="layer-capsule-title">T3: Claude</span>
+                    <span class="layer-capsule-score" id="l5-score">0%</span>
                 </div>
             </div>
 
-            <!-- Traces & Remediation -->
-            <div class="trace-section" id="trace-container">
-                <div class="panel-title" style="font-size:0.65rem; margin-bottom:-0.25rem;">Structured Reasoning Trace</div>
-                <div class="trace-item">All security defense layers passed without triggering alerts.</div>
+            <!-- Analytics Content -->
+            <div class="analytics-content">
+                <div>
+                    <span class="panel-title" style="font-size:0.65rem; margin-bottom:0.4rem; display:block;">Session Skill Chain</span>
+                    <div class="graph-nodes-line" id="graph-nodes-container">
+                        <span class="graph-pill">calculator_skill</span>
+                    </div>
+                </div>
 
-                <div class="panel-title" style="font-size:0.65rem; margin-top:0.5rem; margin-bottom:-0.25rem;">Counterfactual Remediation Steps</div>
-                <div class="remediation-item">No remediation required. Skill complies with security policies.</div>
+                <div id="traces-container" style="display:flex; flex-direction:column; gap:0.6rem;">
+                    <span class="panel-title" style="font-size:0.65rem;">Reasoning Signals</span>
+                    <div class="trace-card">All security defense layers passed without triggering alerts.</div>
+                </div>
+
+                <div id="remediation-container" style="display:flex; flex-direction:column; gap:0.6rem;">
+                    <span class="panel-title" style="font-size:0.65rem;">Actionable Remediation</span>
+                    <div class="remediation-card">No remediation required. Skill complies with security policies.</div>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
-        const BENCHMARKS = {
+        const PRESETS = {
             clean: {
                 skill_name: "calculator_skill",
                 skill_type: "utility",
@@ -549,18 +555,30 @@ os.system(decoded)`
             }
         };
 
-        function loadBenchmark(key) {
+        function loadPreset(key) {
             if (key === 'chain_attack') {
                 runCompositionAttackSimulation();
                 return;
             }
 
-            const data = BENCHMARKS[key];
+            const data = PRESETS[key];
             document.getElementById('skill-name').value = data.skill_name;
             document.getElementById('skill-type').value = data.skill_type;
             document.getElementById('author-id').value = data.author_id;
             document.getElementById('description').value = data.description;
             document.getElementById('code-body').value = data.code_body;
+        }
+
+        function toggleAdvanced() {
+            const fields = document.getElementById('adv-fields');
+            const arrow = document.getElementById('adv-arrow');
+            if (fields.style.display === 'flex') {
+                fields.style.display = 'none';
+                arrow.innerText = '▸';
+            } else {
+                fields.style.display = 'flex';
+                arrow.innerText = '▾';
+            }
         }
 
         async function submitSkill(e) {
@@ -587,26 +605,25 @@ os.system(decoded)`
 
         function renderAnalysis(data) {
             const verdict = data.verdict;
-            const badge = document.getElementById('verdict-badge');
-            const scoreVal = document.getElementById('threat-score');
-            const banner = document.getElementById('verdict-banner');
+            const tag = document.getElementById('verdict-tag');
+            const val = document.getElementById('threat-val');
+            const card = document.getElementById('verdict-card');
 
-            badge.innerText = verdict;
-            badge.className = `verdict-badge ${verdict.toLowerCase()}`;
-            scoreVal.innerText = `${data.overall_threat_score}%`;
+            tag.innerText = verdict;
+            tag.className = `verdict-tag ${verdict.toLowerCase()}`;
+            val.innerText = `${data.overall_threat_score}%`;
 
             if (verdict === 'MALICIOUS') {
-                scoreVal.style.color = 'var(--danger)';
-                banner.className = 'verdict-banner malicious';
+                val.style.color = 'var(--danger)';
+                card.className = 'verdict-card malicious';
             } else if (verdict === 'SUSPICIOUS') {
-                scoreVal.style.color = 'var(--warning)';
-                banner.className = 'verdict-banner';
+                val.style.color = 'var(--warning)';
+                card.className = 'verdict-card';
             } else {
-                scoreVal.style.color = 'var(--accent)';
-                banner.className = 'verdict-banner';
+                val.style.color = 'var(--accent)';
+                card.className = 'verdict-card';
             }
 
-            // Layer scores
             const bd = data.layer_breakdown;
             document.getElementById('l1-score').innerText = `${bd.layer1_rules_ast}%`;
             document.getElementById('l2-score').innerText = `${bd.layer2_prompt_injection}%`;
@@ -614,42 +631,44 @@ os.system(decoded)`
             document.getElementById('l4-score').innerText = `${bd.layer4_graph_composition}%`;
             document.getElementById('l5-score').innerText = `${bd.tier3_claude_reasoning}%`;
 
-            // Graph visualizer
+            // Session skill chain line
             const graphContainer = document.getElementById('graph-nodes-container');
             graphContainer.innerHTML = '';
             
             const nodes = data.graph_details ? data.graph_details.nodes : [data.skill_name];
             nodes.forEach((n, idx) => {
-                const nodeEl = document.createElement('span');
-                nodeEl.className = 'graph-node';
-                nodeEl.innerText = n;
-                graphContainer.appendChild(nodeEl);
+                const pill = document.createElement('span');
+                pill.className = 'graph-pill';
+                pill.innerText = n;
+                graphContainer.appendChild(pill);
 
                 if (idx < nodes.length - 1) {
-                    const arrow = document.createElement('span');
-                    arrow.className = 'graph-arrow';
-                    arrow.innerText = '➔';
-                    graphContainer.appendChild(arrow);
+                    const arr = document.createElement('span');
+                    arr.style.color = 'var(--text-muted)';
+                    arr.style.fontSize = '0.75rem';
+                    arr.innerText = '➔';
+                    graphContainer.appendChild(arr);
                 }
             });
 
             // Reasoning traces
-            const traceContainer = document.getElementById('trace-container');
-            traceContainer.innerHTML = `<div class="panel-title" style="font-size:0.65rem; margin-bottom:-0.25rem;">Structured Reasoning Trace</div>`;
+            const traceContainer = document.getElementById('traces-container');
+            traceContainer.innerHTML = `<span class="panel-title" style="font-size:0.65rem;">Reasoning Signals</span>`;
 
             data.reasoning_trace.forEach(tr => {
                 const item = document.createElement('div');
-                item.className = 'trace-item';
+                item.className = 'trace-card';
                 item.innerText = tr;
                 traceContainer.appendChild(item);
             });
 
-            traceContainer.innerHTML += `<div class="panel-title" style="font-size:0.65rem; margin-top:0.75rem; margin-bottom:-0.25rem;">Counterfactual Remediation Steps</div>`;
+            const remContainer = document.getElementById('remediation-container');
+            remContainer.innerHTML = `<span class="panel-title" style="font-size:0.65rem;">Actionable Remediation</span>`;
             data.remediation_steps.forEach(rem => {
                 const item = document.createElement('div');
-                item.className = 'remediation-item';
+                item.className = 'remediation-card';
                 item.innerText = rem;
-                traceContainer.appendChild(item);
+                remContainer.appendChild(item);
             });
         }
 
@@ -657,7 +676,6 @@ os.system(decoded)`
             const chainSession = "session-attack-" + Math.random().toString(36).substr(2, 6);
             document.getElementById('session-id').value = chainSession;
 
-            // Step 1: file_read (individually clean)
             document.getElementById('skill-name').value = "read_confidential_db";
             document.getElementById('skill-type').value = "file_read";
             document.getElementById('description').value = "Reads local environment configurations.";
@@ -666,7 +684,6 @@ os.system(decoded)`
 
             await new Promise(r => setTimeout(r, 600));
 
-            // Step 2: compress (individually clean)
             document.getElementById('skill-name').value = "compress_archive";
             document.getElementById('skill-type').value = "compress";
             document.getElementById('description').value = "Compresses output files into zip archive.";
@@ -675,7 +692,6 @@ os.system(decoded)`
 
             await new Promise(r => setTimeout(r, 600));
 
-            // Step 3: http_post (triggers Layer 4 Composition Graph Attack Alert!)
             document.getElementById('skill-name').value = "exfiltrate_webhook";
             document.getElementById('skill-type').value = "http_post";
             document.getElementById('description').value = "Sends data to external endpoint.";
@@ -693,19 +709,11 @@ async def get_dashboard():
 
 @app.post("/analyze-skill")
 async def analyze_skill(req: SkillSubmissionModel):
-    # 1. Layer 1: Rules & AST Inspection
     l1_res = rules_engine.analyze_rules_and_ast(req.code_body, req.description)
-
-    # 2. Layer 2: Indirect Prompt Injection & Open-Source ML Semantic Sanitization
     l2_res = sanitizer.scan_and_sanitize_prompt_injection(req.description)
-
-    # 3. Layer 3: Cryptographic Provenance Verification
     l3_res = provenance.verify_skill_provenance(req.skill_name, req.code_body, req.author_id, req.signature)
-
-    # 4. Layer 4: Graph-based Composition Analysis
     l4_res = graph_analyzer.record_skill_invocation(req.session_id, req.skill_name, req.skill_type)
 
-    # 5. Tier 3: Anthropic Claude Deep Reasoning
     prior_signals = {
         "l1_rules_ast": l1_res,
         "l2_prompt_injection": l2_res,
@@ -716,7 +724,6 @@ async def analyze_skill(req: SkillSubmissionModel):
         req.skill_name, req.description, req.code_body, prior_signals
     )
 
-    # 6. Layer 5: Explainability Verdict Compilation
     verdict_res = explainability.evaluate_skill_definition(
         req.skill_name,
         req.description,
@@ -732,7 +739,6 @@ async def analyze_skill(req: SkillSubmissionModel):
         claude_res
     )
 
-    # Attach graph node list for visualizer
     graph_session = graph_analyzer.SESSION_GRAPHS.get(req.session_id, {})
     verdict_res["graph_details"] = {
         "nodes": list(graph_session.get("nodes", [])),
